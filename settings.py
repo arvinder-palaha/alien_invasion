@@ -27,3 +27,8 @@ class Settings:
         self.star_color = (192, 192, 192)
         self.star_size = 2
         self.star_density = 0.0001
+        
+        # rain settings
+        self.rain_speed = 2.0
+        self.rain_density = 0.003
+        self.rain_color = (0, 0, 127)

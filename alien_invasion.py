@@ -6,6 +6,7 @@ from ship import Ship
 from bullet import Bullet
 from alien import Alien
 from star import Star
+from rain import Rain
 
 
 class AlienInvasion:
@@ -20,15 +21,17 @@ class AlienInvasion:
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Alien Invasion")
-    
+
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
-        
+
         self._create_fleet()
-        
+
         self.stars = pygame.sprite.Group()
         self._create_stars()
+
+        self.rains = pygame.sprite.Group()
 
 
     def run_game(self):
@@ -38,6 +41,7 @@ class AlienInvasion:
             self.ship.update()
             self._update_bullets()
             self._update_aliens()
+            # self._update_rains()
             self._update_screen()
 
 
@@ -80,6 +84,15 @@ class AlienInvasion:
         for _ in range(number_stars):
             star = Star(self)
             self.stars.add(star)
+
+
+    def _create_rains(self):
+        """Create the rains."""
+        number_rains = int(self.settings.screen_width * self.settings.screen_height * self.settings.rain_density)
+
+        for _ in range(number_rains):
+            rain = Rain(self)
+            self.rains.add(rain)
 
 
     def _check_events(self):
@@ -156,6 +169,28 @@ class AlienInvasion:
         self.settings.fleet_direction *= -1
 
 
+    def _update_rains(self):
+        """Update the rains."""
+        self.rains.update()
+        
+        # remove rain drops that have fallen below the screen
+        for rain in self.rains.copy():
+            if rain.rect.top >= self.screen.get_rect().bottom:
+                self.rains.remove(rain)
+                
+        # create new rain
+        self._create_rains()
+        
+        
+    def _create_rains(self):
+        """Create new rain."""
+        number_rains = int(self.settings.screen_width * self.settings.rain_density)
+
+        for _ in range(number_rains):
+            rain = Rain(self)
+            self.rains.add(rain)
+
+
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
         self.screen.fill(self.settings.bg_color)
@@ -165,6 +200,8 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
+        for raindrop in self.rains.sprites():
+            raindrop.draw_rain()
 
         # Make the most recently drawn screen visible.
         pygame.display.flip()
