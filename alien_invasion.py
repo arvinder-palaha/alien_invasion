@@ -5,6 +5,7 @@ from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from star import Star
 
 
 class AlienInvasion:
@@ -25,6 +26,9 @@ class AlienInvasion:
         self.aliens = pygame.sprite.Group()
         
         self._create_fleet()
+        
+        self.stars = pygame.sprite.Group()
+        self._create_stars()
 
 
     def run_game(self):
@@ -66,6 +70,15 @@ class AlienInvasion:
         alien.rect.x = alien.x
         alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
         self.aliens.add(alien)
+
+
+    def _create_stars(self):
+        """Create the stars."""
+        number_stars = int(self.settings.screen_width * self.settings.screen_height * self.settings.star_density)
+
+        for _ in range(number_stars):
+            star = Star(self)
+            self.stars.add(star)
 
 
     def _check_events(self):
@@ -119,6 +132,8 @@ class AlienInvasion:
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
         self.screen.fill(self.settings.bg_color)
+        for star in self.stars.sprites():
+            star.draw_star()
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
