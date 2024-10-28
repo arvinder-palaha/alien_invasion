@@ -2,6 +2,7 @@ import sys
 from time import sleep
 import pygame
 
+from button import Button
 from settings import Settings
 from game_stats import GameStats
 from ship import Ship
@@ -32,6 +33,9 @@ class AlienInvasion:
         self.aliens = pygame.sprite.Group()
 
         self._create_fleet()
+        
+        # make the play button
+        self.play_button = Button(self, "Play")
 
         self.stars = pygame.sprite.Group()
         self._create_stars()
@@ -122,6 +126,9 @@ class AlienInvasion:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
 
 
     def _check_keydown_events(self, event):
@@ -151,6 +158,25 @@ class AlienInvasion:
             self.bullets.add(new_bullet)
 
 
+    def _check_play_button(self, mouse_pos):
+        """Start a new game when the player clicks Play."""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.stats.game_active:
+            self.stats.game_active = True
+            self.stats.reset_stats()
+            
+            # get rid of any remaining aliens and bullets
+            self.aliens.empty()
+            self.bullets.empty()
+
+            # create a new fleet and center the ship
+            self._create_fleet()
+            self.ship.center_ship()
+            
+            # hide the mouse cursor
+            pygame.mouse.set_visible(False)
+
+        
     def _update_bullets(self):
         """Update position of bullets and get rid of old bullets."""
         # Update bullet positions.
@@ -206,6 +232,7 @@ class AlienInvasion:
             sleep(0.5)
         else:
             self.stats.game_active = False
+            pygame.mouse.set_visible(True)
 
 
     def _check_fleet_edges(self):
@@ -256,6 +283,8 @@ class AlienInvasion:
         self.aliens.draw(self.screen)
         for raindrop in self.rains.sprites():
             raindrop.draw_rain()
+        if not self.stats.game_active:
+            self.play_button.draw_button()
 
         # Make the most recently drawn screen visible.
         pygame.display.flip()
