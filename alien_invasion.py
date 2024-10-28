@@ -10,6 +10,7 @@ from bullet import Bullet
 from alien import Alien
 from star import Star
 from rain import Rain
+from scoreboard import Scoreboard
 
 
 class AlienInvasion:
@@ -27,7 +28,7 @@ class AlienInvasion:
 
         # store game statistics
         self.stats = GameStats(self)
-
+        self.sb = Scoreboard(self)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
@@ -279,14 +280,22 @@ class AlienInvasion:
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
         self.screen.fill(self.settings.bg_color)
+
         for star in self.stars.sprites():
             star.draw_star()
+
         self.ship.blitme()
+
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+
         self.aliens.draw(self.screen)
+
         for raindrop in self.rains.sprites():
             raindrop.draw_rain()
+
+        self.sb.show_score()
+
         if not self.stats.game_active:
             self.play_button.draw_button()
 
